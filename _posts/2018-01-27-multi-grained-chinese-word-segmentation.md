@@ -1,11 +1,10 @@
 ---
 layout: post
-title: 如何使用 Jacman 主题
+title: 中文多粒度分词实验记录
 tags:
-- Jekyll
-- Jacman
-categories: Jekyll
-description: Jacman 是一款扁平化，有着响应式设计的 Jekyll 主题。本站正式使用了 Jacman 主题。Jacman 基于 Jacman 的 Hexo 主题修改而来。你可以前往本站和 Demo 预览更多关于本主题的更多效果。如果你有任何问题或意见欢迎到 GitHub 发表 issue。
+- MWS
+categories: MWS
+description: 记录中文多粒度分词实验结果
 ---
 ### 2018/1/26
 - CKY解码部分多进程，设置进程数为10
