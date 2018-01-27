@@ -33,8 +33,8 @@ defaults:
 paginate: 20
 
 #### Site
-title : Jekyll Jacman
-tagline: A fresh looking and responsive theme for Jekyll
+title : Gloria's Blog
+tagline: http://hlt.suda.edu.cn/gongchen/
 assets: /assets
 baseurl: 
 
