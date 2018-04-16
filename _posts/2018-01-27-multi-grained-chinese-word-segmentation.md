@@ -6,6 +6,28 @@ tags:
 categories: MWS
 description: 记录中文多粒度分词实验结果
 ---
+### 2018/4/16
+## local loss
+两种解码方法：
+1. 通过比较gold和predict中的（label,s,t）来计算PRF值和accuracy（不能保证解码后能构成一棵树）。
+2. Stern论文中的modified cky recursion（解码能确保构成一棵树）。有三种树分值定义方法：
+
+    - 2.1. 解码时的score不用softmax处理，树的分值定义为所有分值score（label,s,t）的和，其中label ∉ invalid label
+
+    - 2.2. 解码时的score要softmax处理后转化为概率，树的分值定义为所有概率pro（label,s,t）的和，其中label ∉ invalid label
+
+    - 2.3. 解码时的score要softmax处理后转化为概率，树的分值定义为所有概率pro（label,s,t）的乘积，其中label ∉ invalid label
+
+
+解码方法 | 树的分值定义|P|R|F
+---|---|---|---|---
+比较span | 不保证解码成树|78.3|75.1|76.6
+modified cky | 分值求和|71.9|43.7|54.4
+modified cky|概率求和|68.7|85.6|76.2
+modified cky|概率乘积|74.4|54.6|63.0
+
+
+## inside outside loss(待整理)
 ### 2018/1/31
 - 对小矩阵代码进行优化：
 1. 在cky过程中用numpy计算，只保存label,split point,累计score。cky解码结束后再构建图，生成树。
