@@ -8,37 +8,64 @@ description: 记录中文多粒度分词实验结果
 ---
 ### 2018/4/16
 ## local loss
+### 新增incomplete label
+- 有三种label:complete label(包括S,PW,W等),incomplete label(例如，中国人是一==个最细粒度==的词语，那么“中”“国”“人”“中国”“国人”均为incomplete label)和invalid label。
+- complete label,incomplete label,invalid label的分值均为模型预测出的分值（不存在像之前将某个label分值人工赋值为0的情况）
+- 解码方法一、modified cky：
+  1. 解码时没softmax，整棵树的分值定义为score（label,s,t）的和，其中label ∉ invalid label且label ∉ incomplete label
+  2. 解码时需要softmax，整棵树的分值定义为pro（label,s,t）的和，其中label ∉  invalid label且label ∉ incomplete label
+  3. 解码时需要softmax，整棵树的分值定义为pro（label,s,t）的乘积，其中label ∉ invalid label且label ∉ incomplete label
+- 解码方法二、之前张老师讲的通过对比predict和gold中的（label,s,t）解码，不保证构成树
+
+
+
+#### 在训练集5000句，开发集1000句的多粒度分词数据和英文短语结构分析数据上分别实验：
+
+数据集|解码方法 | 树的分值定义|P|R|F(dev)
+---|---|---|---|---|---
+英文短语结构|比较span | 不保证解码成树|86.12|84.38|==85.24==
+英文短语结构|modified cky | 分值求和|33.20|55.68|41.60
+英文短语结构|modified cky|概率求和|56.59|85.34|++68.06++
+英文短语结构|modified cky|概率乘积|48.65|71.96|58.05
+中文多粒度分词|比较span | 不保证解码成树|87.39|84.62|==85.98==
+中文多粒度分词|modified cky | 分值求和|82.29|59.18|68.85
+中文多粒度分词|modified cky|概率求和|65.95|91.54|++76.67++
+中文多粒度分词|modified cky|概率乘积|71.23|65.11|68.03
+
+
 两种解码方法：
 1. 通过比较gold和predict中的（label,s,t）来计算PRF值和accuracy（不能保证解码后能构成一棵树）。
 2. Stern论文中的modified cky recursion（解码能确保构成一棵树）。有三种树分值定义方法：
 
     - 2.1. 解码时的score不用softmax处理，树的分值定义为所有分值score（label,s,t）的和，其中label ∉ invalid label
 
-    - 2.2. 解码时的score要softmax处理后转化为概率，树的分值定义为所有概率pro（label,s,t）的和，其中label ∉ invalid label
+    - 2.2. 解码时的score要softmax处理后转化为概率（==将empty label赋值为0与其他非invalid label一起softmax==），树的分值定义为所有概率pro（label,s,t）的和，其中label ∉ invalid label
 
-    - 2.3. 解码时的score要softmax处理后转化为概率，树的分值定义为所有概率pro（label,s,t）的乘积，其中label ∉ invalid label
+    - 2.3. 解码时的score要softmax处理后转化为概率（==将empty label赋值为0与其他非invalid label一起softmax==），树的分值定义为所有概率pro（label,s,t）的乘积，其中label ∉ invalid label
 
 
 #### 在训练集500句，开发集200句多粒度分词数据上的实验结果：
 
 解码方法 | 树的分值定义|P|R|F(dev)
----|---|---|---|---|
+---|---|---|---|---
 比较span | 不保证解码成树|78.3|75.1|76.6
+
+(下表有误)
+
+解码方法 | 树的分值定义|P|R|F(dev)
+---|---|---|---|---
 modified cky | 分值求和|71.9|43.7|54.4
 modified cky|概率求和|68.7|85.6|76.2
 modified cky|概率乘积|74.4|54.6|63.0
 
 
-#### 在训练集15000句，开发集5777句多粒度分词数据上的实验结果：
+#### 在训练集15000句，开发集5777句，测试集1500句多粒度分词数据上的实验结果：
 
 解码方法 | 树的分值定义|P|R|F(dev)|P|R|F(test)
----|---|---|---|---|---|---|---|
+---|---|---|---|---|---|---|---
 比较span | 不保证解码成树|88.0|95.1|91.5|94.1|92.9|93.5
 
 [同样配置下Stern的minimal span parser上的实验结果(dev)：P=95.58,R=95.45,F=95.51]
-
-
-
 
 ## inside outside loss(待整理)
 ### 2018/1/31
